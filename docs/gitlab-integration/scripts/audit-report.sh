@@ -5,7 +5,7 @@
 # 用途：读取 /var/log/gitlab/commit-check.log，按仓库/用户/规则维度汇总
 #       WARN / REJECT / BYPASS / CHECK 记录，用于观察期评审与日报。
 #
-# 运行位置：gitlab-01 上，opsadmin + sudo（日志属主 git，普通用户可能不可读）
+# 运行位置：GitLab 服务器上，opsadmin + sudo（日志属主 git，普通用户可能不可读）
 #
 # 用法：
 #   sudo bash audit-report.sh
@@ -13,7 +13,7 @@
 #   sudo bash audit-report.sh --markdown > report.md
 #
 # 日志格式（由 pre-receive 写入）：
-#   2026-07-30 14:03:21+0800 | REJECT | user=zhangsan | repo=devops/aegispipe | sha=9fe42b4 | reason=标签不匹配规范 | subject=bad commit no tag
+#   2026-07-30 14:03:21+0800 | REJECT | user=zhangsan | repo=devops/7dgroup | sha=9fe42b4 | reason=标签不匹配规范 | subject=bad commit no tag
 # ============================================================================
 
 set -u
@@ -150,7 +150,7 @@ print_terminal_section() {
 # ----------------------------------------------------------------------------
 if [ "${MARKDOWN}" = "true" ]; then
     cat <<EOF
-## AegisPipe 提交规范审计日报（${SINCE} ~ ${UNTIL}）
+## 7DGroup 提交规范审计日报（${SINCE} ~ ${UNTIL}）
 
 | 指标 | 数量 |
 |------|------|
@@ -171,7 +171,7 @@ EOF
 else
     cat <<EOF
 ================================================================================
-AegisPipe 提交规范审计报告（${SINCE} ~ ${UNTIL}）
+7DGroup 提交规范审计报告（${SINCE} ~ ${UNTIL}）
 日志来源：${LOG_FILE}
 ================================================================================
 总记录：${TOTAL}    WARN：${WARN_COUNT}    REJECT：${REJECT_COUNT}    BYPASS：${BYPASS_COUNT}    CHECK：${CHECK_COUNT}

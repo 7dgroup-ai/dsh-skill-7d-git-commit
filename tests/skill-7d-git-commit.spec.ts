@@ -14,7 +14,7 @@ describe('dsh-skill-7d-git-commit', () => {
 
     expect(await ctx.skills.list()).toEqual([{
       name: '7d-git-commit',
-      description: 'AegisPipe 提交规范适配 Skill：在生成 git commit message 前自动校验并套用盛盾 AegisPipe 项目的提交规范，规避服务端 pre-receive hook 拦截。当用户需要 git commit 或生成提交信息时使用。',
+      description: '7DGroup 提交规范适配 Skill：在生成 git commit message 前自动校验并套用 7DGroup 项目的提交规范，规避服务端 pre-receive hook 拦截。当用户需要 git commit 或生成提交信息时使用。',
       invocation: { modelInvocable: true, userInvocable: true },
       provider: '7d-git-commit',
       source: 'bundled',

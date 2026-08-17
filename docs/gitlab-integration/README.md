@@ -36,10 +36,10 @@ docs/gitlab-integration/
    bash test-hook-locally.sh -m "【新增】用户模块新增手机号登录接口"
    bash test-hook-locally.sh -m "【新增】配置邮箱 a@b.com"
    ```
-3. **复制到 gitlab-01**：将整个 `docs/gitlab-integration/` 目录复制到 gitlab-01（如 `/data/aegispipe/dsh-skill-7d-git-commit-docs/`）。
+3. **复制到 GitLab 服务器**：将整个 `docs/gitlab-integration/` 目录复制到 GitLab 服务器（如 `/data/7dgroup/dsh-skill-7d-git-commit-docs/`）。
 4. **部署**：
    ```bash
-   sudo bash install-hooks.sh --pilot devops/aegispipe
+   sudo bash install-hooks.sh --pilot devops/7dgroup
    # 试点通过后
    sudo bash install-hooks.sh --global
    ```
@@ -55,5 +55,5 @@ docs/gitlab-integration/
 ## 注意事项
 
 1. 本目录文件**不进入 DSH 插件运行时包**，仅供团队按需复制到 GitLab 服务器使用。
-2. 生产环境的权威 hook 脚本仍由 `06-部署脚本与工具/gitlab-server-hooks/`（盛盾 AegisPipe 项目）维护，本目录为其配套模板，保持对齐。
+2. 生产环境的权威 hook 脚本以本仓库 `docs/gitlab-integration/`（7DGroup 项目）为准，部署侧如有调整请同步回本仓库保持对齐。
 3. 部署前请根据实际 GitLab 版本、仓库路径、钉钉 Webhook 调整脚本中的常量。

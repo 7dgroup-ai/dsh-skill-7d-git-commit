@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # ============================================================================
-# sync-rules.sh —— 同步 commit-rules.conf 到 gitlab-01 hook 部署位置
+# sync-rules.sh —— 同步 commit-rules.conf 到 GitLab 服务器 hook 部署位置
 # ----------------------------------------------------------------------------
-# 用途：当本仓库中的 commit-rules.conf 变更后，将其同步到 gitlab-01 的单仓试点
+# 用途：当本仓库中的 commit-rules.conf 变更后，将其同步到 GitLab 服务器的单仓试点
 #       或全局 hook 目录，无需重新运行完整的 install-hooks.sh。
 #
 # 用法：
 #   sudo bash sync-rules.sh --global --dry-run      # 先查看差异
 #   sudo bash sync-rules.sh --global                # 同步到全局
-#   sudo bash sync-rules.sh --pilot devops/aegispipe # 同步到单仓
+#   sudo bash sync-rules.sh --pilot devops/7dgroup # 同步到单仓
 #
 # 安全：
 #   - 默认备份旧配置（带时间戳 .bak）。

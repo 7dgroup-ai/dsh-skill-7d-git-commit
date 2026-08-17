@@ -27,7 +27,7 @@ The bundled skill is a drop-in composition layer: install the bundle into a DSH 
 | Field | Value |
 |---|---|
 | Author | 7DGroup |
-| Version | 0.1.0-rc.2 |
+| Version | 0.1.0-rc.3 |
 | Runtime | Node `^22.19.0 || >=24.0.0` · pnpm 10+ · dsh CLI |
 | Peer dependencies | `@deepseek-ai/cordis` · `@deepseek-ai/dsh-skill` · `@deepseek-ai/dsh-invariants` |
 | Skill name | `7d-git-commit` |
@@ -38,7 +38,7 @@ The bundled skill is a drop-in composition layer: install the bundle into a DSH 
 
 - **Client-side commit validation** before `git commit` is executed.
 - **9 fixed Chinese type tags** such as `【新增】`, `【修复】`, `【优化】`, `【文档】`, etc.
-- **Title length, punctuation, forbidden characters/phrases, and wording rules** from the AegisPipe convention.
+- **Title length, punctuation, forbidden characters/phrases, and wording rules** from the 7DGroup convention.
 - **Body formatting rules**: numbered lists, max 70 chars per line.
 - **Exemptions** for merge commits and emergency `[skip-check]` deployments.
 - **Bundled reference** `references/git-commit-message.md` acts as the source of truth and is loaded on demand.
@@ -54,7 +54,7 @@ dsh-skill-7d-git-commit/
 ├── assets/7d-git-commit/
 │   ├── SKILL.md              # Skill body (validation logic)
 │   └── references/
-│       └── git-commit-message.md   # AegisPipe commit convention reference
+│       └── git-commit-message.md   # 7DGroup commit convention reference
 ├── tests/
 │   └── skill-7d-git-commit.spec.ts
 ├── cordis.patch.yml          # Composition layer patch
@@ -105,7 +105,7 @@ The skill will:
 
 ## Commit Convention
 
-See `assets/7d-git-commit/references/git-commit-message.md` for the full AegisPipe rules.
+See `assets/7d-git-commit/references/git-commit-message.md` for the full 7DGroup rules.
 
 High-level requirements:
 
@@ -126,11 +126,11 @@ The plugin provides both a client-side DSH skill and a server-side GitLab hook. 
 
 ### Deploy server-side hooks
 
-Copy `docs/gitlab-integration/` to gitlab-01, then run:
+Copy `docs/gitlab-integration/` to the GitLab server, then run:
 
 ```sh
 # single-repo pilot
-sudo bash install-hooks.sh --pilot devops/aegispipe
+sudo bash install-hooks.sh --pilot devops/7dgroup
 
 # after pilot passes
 sudo bash install-hooks.sh --global
@@ -169,7 +169,7 @@ For the full deployment SOP, see [`docs/gitlab-integration/deployment-guide.md`]
 1. The provider contributes a single fixed skill and offers no runtime customization.
 2. `prepare` does not emit type declarations; the dsh loader only needs the runtime entry.
 3. The build only transpiles; type errors are visible in your editor but not checked during build.
-4. The `docs/gitlab-integration/` files are not part of the DSH runtime bundle; copy them to gitlab-01 on demand.
+4. The `docs/gitlab-integration/` files are not part of the DSH runtime bundle; copy them to the GitLab server on demand.
 
 ## License
 

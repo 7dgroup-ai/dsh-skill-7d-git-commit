@@ -1,12 +1,12 @@
 ---
 name: 7d-git-commit
-description: 在生成 git commit message 前自动校验并套用盛盾 AegisPipe 项目的提交规范，规避 gitlab-01 服务端 pre-receive hook 拦截。触发场景：任何需要 git commit 的代码提交操作。
+description: 在生成 git commit message 前自动校验并套用 7DGroup 项目的提交规范，规避 GitLab 服务端 pre-receive hook 拦截。触发场景：任何需要 git commit 的代码提交操作。
 ---
 
-# AegisPipe 提交规范适配 Skill
+# 7DGroup 提交规范适配 Skill
 
 > 事实来源：`references/git-commit-message.md`  
-> 服务端兜底：gitlab-01 `pre-receive` hook（当前 MODE=warn，观察期后切换 reject）
+> 服务端兜底：GitLab 服务端 `pre-receive` hook（当前 MODE=warn，观察期后切换 reject）
 
 ## 核心原则
 
@@ -77,8 +77,8 @@ description: 在生成 git commit message 前自动校验并套用盛盾 AegisPi
 
 | 层级 | 位置 | 行为 | 适用阶段 |
 |------|------|------|---------|
-| 客户端预判 | Kimi Code（本 skill） | 生成 message 前校验，不合规则提示修正 | 日常开发 |
-| 服务端兜底 | gitlab-01 pre-receive hook | push 时二次校验，warn 模式告警 / reject 模式拦截 | 观察期 / 硬拦截期 |
+| 客户端预判 | DSH 客户端（本 skill） | 生成 message 前校验，不合规则提示修正 | 日常开发 |
+| 服务端兜底 | GitLab pre-receive hook | push 时二次校验，warn 模式告警 / reject 模式拦截 | 观察期 / 硬拦截期 |
 
 ## 标准示例
 
@@ -127,6 +127,6 @@ hotfix 修复支付接口超时 [skip-check]
 
 ## 相关文档
 
-- `.trae/rules/git-commit-message.md` — 提交规范事实来源
-- `05-部署配置-生产/gitlab-01/服务端Hook提交校验操作手册.md` — hook 部署与验证
-- `06-部署脚本与工具/gitlab-server-hooks/` — hook 脚本与规则配置
+- `assets/7d-git-commit/references/git-commit-message.md` — 提交规范事实来源
+- `docs/gitlab-integration/deployment-guide.md` — hook 部署与验证
+- `docs/gitlab-integration/` — hook 脚本与规则配置

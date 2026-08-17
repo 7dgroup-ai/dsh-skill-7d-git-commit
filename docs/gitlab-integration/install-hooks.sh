@@ -2,7 +2,7 @@
 # ============================================================================
 # install-hooks.sh —— GitLab 服务端提交校验 hook 安装/卸载脚本
 # ----------------------------------------------------------------------------
-# 适配 GitLab CE 19.2.0（Omnibus 直装），在 gitlab-01 上以 opsadmin + sudo 执行。
+# 适配 GitLab CE 19.2.0（Omnibus 直装），在 GitLab 服务器上以 opsadmin + sudo 执行。
 #
 # 用法：
 #   sudo bash install-hooks.sh --pilot <项目全路径>
@@ -34,7 +34,7 @@ preflight() {
     [ "$(id -u)" -eq 0 ] || die "请用 sudo 执行本脚本。"
     [ -f "${HOOK_SRC}" ]  || die "未找到 pre-receive：${HOOK_SRC}"
     [ -f "${RULES_SRC}" ] || die "未找到 commit-rules.conf：${RULES_SRC}"
-    command -v gitlab-ctl >/dev/null 2>&1 || die "未找到 gitlab-ctl，请在 gitlab-01 上执行。"
+    command -v gitlab-ctl >/dev/null 2>&1 || die "未找到 gitlab-ctl，请在 GitLab 服务器上执行。"
     ok "前置检查通过"
 }
 
@@ -102,9 +102,9 @@ do_global() {
 
     cat >> "${GITLAB_RB}" <<'EOF'
 
-# --- AegisPipe 服务端提交校验 hook（全局 custom_hooks_dir）---
+# --- 7DGroup 服务端提交校验 hook（全局 custom_hooks_dir）---
 gitaly['configuration'][:hooks][:custom_hooks_dir] = '/var/opt/gitlab/gitaly/custom_hooks'
-# --- AegisPipe hook end ---
+# --- 7DGroup hook end ---
 EOF
     ok "已写入 gitlab.rb"
 
@@ -150,8 +150,8 @@ do_uninstall_global() {
     rm -f "${GLOBAL_HOOKS_DIR}/pre-receive.d/01-commit-check" 2>/dev/null && ok "已移除全局 hook 文件"
     rm -f "${GLOBAL_HOOKS_DIR}/commit-rules.conf" 2>/dev/null || true
 
-    if grep -q "AegisPipe hook end" "${GITLAB_RB}"; then
-        sed -i -E '/AegisPipe 服务端提交校验 hook/,/AegisPipe hook end/d' "${GITLAB_RB}"
+    if grep -q "7DGroup hook end" "${GITLAB_RB}"; then
+        sed -i -E '/7DGroup 服务端提交校验 hook/,/7DGroup hook end/d' "${GITLAB_RB}"
         ok "已从 gitlab.rb 移除配置"
         info "执行 gitlab-ctl reconfigure ..."
         gitlab-ctl reconfigure
@@ -172,7 +172,7 @@ install-hooks.sh —— GitLab 服务端提交校验 hook 安装/卸载
   sudo bash $0 --uninstall-global              # 卸载全局
 
 前置：
-  - 在 gitlab-01 上以 opsadmin + sudo 执行
+  - 在 GitLab 服务器上以 opsadmin + sudo 执行
   - pre-receive 与 commit-rules.conf 须与本脚本同目录
 EOF
 }

@@ -20,7 +20,7 @@
 set -u
 
 WEBHOOK="${DINGTALK_WEBHOOK:-}"
-TITLE="AegisPipe 提交规范违规日报"
+TITLE="7DGroup 提交规范违规日报"
 SINCE=""
 UNTIL=""
 DRY_RUN=false

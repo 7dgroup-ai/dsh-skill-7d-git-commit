@@ -51,14 +51,14 @@ sudo bash scripts/audit-report.sh --since $(date -d '7 days ago' +%Y-%m-%d) --un
 
 | 仓库全路径 | 验证人 | 验证日期 | 结果 |
 |-----------|--------|---------|------|
-| devops/aegispipe | | | □ 通过 □ 未验证 |
+| devops/7dgroup | | | □ 通过 □ 未验证 |
 | （其他核心业务仓） | | | □ 通过 □ 未验证 |
 
 ### 2.2 验证命令模板
 
 ```bash
 GITLAB_HOST=10.94.7.1
-REPO=devops/aegispipe
+REPO=devops/7dgroup
 git clone ssh://git@${GITLAB_HOST}:2222/${REPO}.git && cd $(basename "$REPO")
 git checkout -b test/hook-verify
 

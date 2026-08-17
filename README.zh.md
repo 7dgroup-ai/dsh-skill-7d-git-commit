@@ -25,7 +25,7 @@
 | 项目 | 值 |
 |---|---|
 | 作者 | 7DGroup |
-| 版本 | 0.1.0-rc.2 |
+| 版本 | 0.1.0-rc.3 |
 | 运行环境 | Node `^22.19.0 || >=24.0.0` · pnpm 10+ · dsh CLI |
 | Peer 依赖 | `@deepseek-ai/cordis` · `@deepseek-ai/dsh-skill` · `@deepseek-ai/dsh-invariants` |
 | 技能名称 | `7d-git-commit` |
@@ -52,7 +52,7 @@ dsh-skill-7d-git-commit/
 ├── assets/7d-git-commit/
 │   ├── SKILL.md              # 技能体：校验逻辑
 │   └── references/
-│       └── git-commit-message.md   # AegisPipe 提交规范事实来源
+│       └── git-commit-message.md   # 7DGroup 提交规范事实来源
 ├── tests/
 │   └── skill-7d-git-commit.spec.ts
 ├── cordis.patch.yml          # 组合层补丁
@@ -124,11 +124,11 @@ pnpm test    # vitest
 
 ### 部署服务端 hook
 
-将 `docs/gitlab-integration/` 目录复制到 gitlab-01，然后执行：
+将 `docs/gitlab-integration/` 目录复制到 GitLab 服务器，然后执行：
 
 ```sh
 # 单仓试点
-sudo bash install-hooks.sh --pilot devops/aegispipe
+sudo bash install-hooks.sh --pilot devops/7dgroup
 
 # 试点验证通过后推广全局
 sudo bash install-hooks.sh --global
@@ -167,7 +167,7 @@ sudo -E bash scripts/dingtalk-notify.sh
 1. 该提供方只贡献一个固定 skill，不提供运行时自定义。
 2. `prepare` 构建不附带类型声明；dsh Loader 只加载运行时入口。
 3. 构建只做转译（`dts: false`），没有 lint 或类型检查脚本——类型错误只能在编辑器/IDE 中暴露。
-4. `docs/gitlab-integration/` 目录文件不进入 DSH 运行时包，请按需复制到 gitlab-01 使用。
+4. `docs/gitlab-integration/` 目录文件不进入 DSH 运行时包，请按需复制到 GitLab 服务器使用。
 
 ## 许可证
 

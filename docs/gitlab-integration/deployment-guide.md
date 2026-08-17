@@ -5,7 +5,7 @@
 > 事实来源：
 > - 客户端 skill：`assets/git-commit/SKILL.md`
 > - 提交规范：`assets/git-commit/references/git-commit-message.md`
-> - 生产环境权威配置：`06-部署脚本与工具/gitlab-server-hooks/`（盛盾 AegisPipe 项目）
+> - 生产环境权威配置：本仓库 `docs/gitlab-integration/`（7DGroup 项目）
 
 ## 适用范围
 
@@ -14,7 +14,7 @@
 
 ## 目录内容
 
-本目录提供可直接复制到 gitlab-01 执行的脚本模板：
+本目录提供可直接复制到 GitLab 服务器执行的脚本模板：
 
 | 文件 | 用途 |
 |------|------|
@@ -48,8 +48,8 @@ ALLOW_MERGE=true
 ### 2. 单仓试点（推荐首上线）
 
 ```bash
-# 在 gitlab-01 上，以 opsadmin + sudo 执行
-sudo bash install-hooks.sh --pilot devops/aegispipe
+# 在 GitLab 服务器上，以 opsadmin + sudo 执行
+sudo bash install-hooks.sh --pilot devops/7dgroup
 ```
 
 ### 3. 全局推广
@@ -58,7 +58,7 @@ sudo bash install-hooks.sh --pilot devops/aegispipe
 
 ```bash
 # 若目标仓已部署单仓试点 hook，请先卸载，避免重复执行
-sudo bash install-hooks.sh --uninstall-pilot devops/aegispipe
+sudo bash install-hooks.sh --uninstall-pilot devops/7dgroup
 sudo bash install-hooks.sh --global
 ```
 
@@ -92,7 +92,7 @@ sudo sed -i 's/^MODE="warn"/MODE="reject"/' /var/opt/gitlab/gitaly/custom_hooks/
 
 ```bash
 # 单仓回滚
-sudo bash install-hooks.sh --uninstall-pilot devops/aegispipe
+sudo bash install-hooks.sh --uninstall-pilot devops/7dgroup
 
 # 全局回滚
 sudo bash install-hooks.sh --uninstall-global
