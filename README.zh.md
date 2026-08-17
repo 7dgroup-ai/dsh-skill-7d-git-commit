@@ -33,6 +33,7 @@
 | 运行环境 | Node `^22.19.0 || >=24.0.0` · pnpm 10+ · dsh CLI |
 | Peer 依赖 | `@deepseek-ai/cordis` · `@deepseek-ai/dsh-skill` · `@deepseek-ai/dsh-invariants` |
 | 技能名称 | `7d-git-commit` |
+| GitLab 兼容性 | GitLab CE 19.2.0（服务端 hooks） |
 | 仓库地址 | [github.com/7dgroup-ai/dsh-skill-7d-git-commit](https://github.com/7dgroup-ai/dsh-skill-7d-git-commit) |
 | 许可证 | MIT |
 

@@ -35,6 +35,7 @@ The bundled skill is a drop-in composition layer: install the bundle into a DSH 
 | Runtime | Node `^22.19.0 || >=24.0.0` · pnpm 10+ · dsh CLI |
 | Peer dependencies | `@deepseek-ai/cordis` · `@deepseek-ai/dsh-skill` · `@deepseek-ai/dsh-invariants` |
 | Skill name | `7d-git-commit` |
+| GitLab compatibility | GitLab CE 19.2.0 (server-side hooks) |
 | Repository | [github.com/7dgroup-ai/dsh-skill-7d-git-commit](https://github.com/7dgroup-ai/dsh-skill-7d-git-commit) |
 | License | MIT |
 
