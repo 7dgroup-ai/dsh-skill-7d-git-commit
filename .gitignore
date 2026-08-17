@@ -4,8 +4,6 @@ node_modules/
 # Build output
 lib/
 
-# Package artifacts
-*.tgz
 
 # Logs
 *.log
