@@ -112,6 +112,10 @@ Once installed, mention any commit-related request in a dsh session:
 
 > Generate a commit message for the current changes.
 
+You can also trigger the skill explicitly with the slash command:
+
+> /7d-git-commit
+
 Example triggers:
 
 - Generate a commit message for the current changes.

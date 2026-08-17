@@ -108,6 +108,10 @@ pnpm test    # vitest
 
 > 为当前改动生成一条 commit message。
 
+也可以使用斜杠命令显式触发技能：
+
+> /7d-git-commit
+
 触发内容示例：
 
 - 为当前改动生成一条 commit message。
