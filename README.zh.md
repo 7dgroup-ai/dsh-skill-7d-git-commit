@@ -9,6 +9,10 @@
 </p>
 
 <p align="center">
+  <img alt="7d-git-commit 封面图" src="assets/images/7d-git-commit-cover.jpg" width="80%">
+</p>
+
+<p align="center">
   <a href="README.md">English</a> | <strong>中文</strong>
 </p>
 
@@ -53,6 +57,8 @@ dsh-skill-7d-git-commit/
 │   ├── SKILL.md              # 技能体：校验逻辑
 │   └── references/
 │       └── git-commit-message.md   # 7DGroup 提交规范事实来源
+├── assets/images/
+│   └── 7d-git-commit-cover.jpg     # README 封面图
 ├── tests/
 │   └── skill-7d-git-commit.spec.ts
 ├── cordis.patch.yml          # 组合层补丁
