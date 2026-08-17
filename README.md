@@ -81,6 +81,16 @@ To avoid the build authorization, use a pre-built tarball or the published npm p
 dsh plugin --profile web add @7dgroup/dsh-skill-7d-git-commit
 ```
 
+### Install from within a dsh session (recommended)
+
+The most direct way — just ask the agent in any dsh conversation, and it runs the install for you. Use the GitHub spec — the npm name `@7dgroup/dsh-skill-7d-git-commit` only works after the package is published:
+
+> 安装插件 github:7dgroup-ai/dsh-skill-7d-git-commit
+
+(Or in English: "Install the plugin github:7dgroup-ai/dsh-skill-7d-git-commit" — the agent executes the equivalent `dsh plugin` command through its session shell.)
+
+For a git install the agent will hit the same pnpm `allowBuilds` gate and print the exact key to add to the profile's pnpm settings file (`~/.dsh/profiles/<name>/pnpm-workspace.yaml`); after you add it, ask the agent to retry and the skill is enabled.
+
 ### Build and Test
 
 ```sh
