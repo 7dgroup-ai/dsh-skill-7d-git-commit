@@ -1,5 +1,5 @@
 ---
-name: git-commit
+name: 7d-git-commit
 description: 在生成 git commit message 前自动校验并套用盛盾 AegisPipe 项目的提交规范，规避 gitlab-01 服务端 pre-receive hook 拦截。触发场景：任何需要 git commit 的代码提交操作。
 ---
 

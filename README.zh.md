@@ -16,7 +16,7 @@
 
 **作者：7DGroup**
 
-一个 DSH（DeepSeek Harness）组合层插件包，通过 `ctx.skills` 注册 `git-commit` 技能。在生成任何 `git commit` 提交信息前，自动按**7DGroup 项目提交规范**进行校验，规避 gitlab 服务端 `pre-receive` hook 拦截。零核心改动——安装即启用，移除 bundle 行即卸载。
+一个 DSH（DeepSeek Harness）组合层插件包，通过 `ctx.skills` 注册 `7d-git-commit` 技能。在生成任何 `git commit` 提交信息前，自动按**7DGroup 项目提交规范**进行校验，规避 gitlab 服务端 `pre-receive` hook 拦截。零核心改动——安装即启用，移除 bundle 行即卸载。
 
 ---
 
@@ -25,10 +25,10 @@
 | 项目 | 值 |
 |---|---|
 | 作者 | 7DGroup |
-| 版本 | 0.1.0-rc.1 |
+| 版本 | 0.1.0-rc.2 |
 | 运行环境 | Node `^22.19.0 || >=24.0.0` · pnpm 10+ · dsh CLI |
 | Peer 依赖 | `@deepseek-ai/cordis` · `@deepseek-ai/dsh-skill` · `@deepseek-ai/dsh-invariants` |
-| 技能名称 | `git-commit` |
+| 技能名称 | `7d-git-commit` |
 | 仓库地址 | [github.com/7dgroup-ai/dsh-skill-7d-git-commit](https://github.com/7dgroup-ai/dsh-skill-7d-git-commit) |
 | 许可证 | MIT |
 
@@ -49,12 +49,12 @@ dsh-skill-7d-git-commit/
 ├── src/
 │   ├── index.ts              # Cordis 插件：注册技能提供者
 │   └── invariant.ts          # 包所有权不变量伴生插件
-├── assets/git-commit/
+├── assets/7d-git-commit/
 │   ├── SKILL.md              # 技能体：校验逻辑
 │   └── references/
 │       └── git-commit-message.md   # AegisPipe 提交规范事实来源
 ├── tests/
-│   └── skill-git-commit.spec.ts
+│   └── skill-7d-git-commit.spec.ts
 ├── cordis.patch.yml          # 组合层补丁
 ├── tsdown.config.ts          # 自包含转译配置
 ├── package.json
@@ -103,7 +103,7 @@ pnpm test    # vitest
 
 ## 提交规范
 
-完整规则见 `assets/git-commit/references/git-commit-message.md`。
+完整规则见 `assets/7d-git-commit/references/git-commit-message.md`。
 
 核心要求：
 
@@ -118,9 +118,9 @@ pnpm test    # vitest
 
 本插件同时提供客户端 DSH skill 与服务端 GitLab hook，建议组合使用形成"客户端预判 + 服务端兜底"的双层校验。
 
-- 客户端：`assets/git-commit/SKILL.md` 在 `git commit` 前校验提交信息。
+- 客户端：`assets/7d-git-commit/SKILL.md` 在 `git commit` 前校验提交信息。
 - 服务端：`docs/gitlab-integration/pre-receive` 在 `git push` 到达仓库前校验并告警/拦截。
-- 规范来源：`assets/git-commit/references/git-commit-message.md`，客户端与服务端共用同一套规则。
+- 规范来源：`assets/7d-git-commit/references/git-commit-message.md`，客户端与服务端共用同一套规则。
 
 ### 部署服务端 hook
 

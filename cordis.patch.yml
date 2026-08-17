@@ -2,5 +2,5 @@
 # (dsh plugin --profile <name> add <this package>). The row references this
 # package by name so Node module resolution finds the installed code.
 - insert:
-    - id: skill-git-commit
+    - id: skill-7d-git-commit
       name: '@7dgroup/dsh-skill-7d-git-commit'

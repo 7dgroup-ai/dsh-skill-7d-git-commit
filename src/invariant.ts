@@ -8,15 +8,15 @@ import type { Context } from '@deepseek-ai/cordis'
 import type { InvariantInstaller } from '@deepseek-ai/dsh-invariants'
 
 const PACKAGE_NAME = '@7dgroup/dsh-skill-7d-git-commit'
-const SKILL_NAME = 'git-commit'
+const SKILL_NAME = '7d-git-commit'
 
 /** Cordis companion plugin name. */
-export const name = 'skill-git-commit-invariant'
+export const name = 'skill-7d-git-commit-invariant'
 /** Service required before the companion can reserve package ownership. */
 export const inject = ['invariants']
 
 /**
- * Startup invariant: the bundled `git-commit` provider must expose exactly one
+ * Startup invariant: the bundled `7d-git-commit` provider must expose exactly one
  * skill whose name matches the package contract. Registration uniqueness and
  * lifecycle remain owned by the skill registry.
  *

@@ -16,7 +16,7 @@
 
 **Author: 7DGroup**
 
-A DSH (DeepSeek Harness) bundle plugin that registers the `git-commit` skill on `ctx.skills`. Before generating any `git commit` message, the skill validates it against the **7DGroup commit convention** and warns or guides the user to fix violations — a client-side guard that complements the server-side `pre-receive` hook on gitlab.
+A DSH (DeepSeek Harness) bundle plugin that registers the `7d-git-commit` skill on `ctx.skills`. Before generating any `git commit` message, the skill validates it against the **7DGroup commit convention** and warns or guides the user to fix violations — a client-side guard that complements the server-side `pre-receive` hook on gitlab.
 
 The bundled skill is a drop-in composition layer: install the bundle into a DSH profile and the skill becomes available in every session using that profile; remove the bundle to uninstall it cleanly.
 
@@ -27,10 +27,10 @@ The bundled skill is a drop-in composition layer: install the bundle into a DSH 
 | Field | Value |
 |---|---|
 | Author | 7DGroup |
-| Version | 0.1.0-rc.1 |
+| Version | 0.1.0-rc.2 |
 | Runtime | Node `^22.19.0 || >=24.0.0` · pnpm 10+ · dsh CLI |
 | Peer dependencies | `@deepseek-ai/cordis` · `@deepseek-ai/dsh-skill` · `@deepseek-ai/dsh-invariants` |
-| Skill name | `git-commit` |
+| Skill name | `7d-git-commit` |
 | Repository | [github.com/7dgroup-ai/dsh-skill-7d-git-commit](https://github.com/7dgroup-ai/dsh-skill-7d-git-commit) |
 | License | MIT |
 
@@ -51,12 +51,12 @@ dsh-skill-7d-git-commit/
 ├── src/
 │   ├── index.ts              # Cordis plugin: registers the skill provider
 │   └── invariant.ts          # Package-owned invariant companion
-├── assets/git-commit/
+├── assets/7d-git-commit/
 │   ├── SKILL.md              # Skill body (validation logic)
 │   └── references/
 │       └── git-commit-message.md   # AegisPipe commit convention reference
 ├── tests/
-│   └── skill-git-commit.spec.ts
+│   └── skill-7d-git-commit.spec.ts
 ├── cordis.patch.yml          # Composition layer patch
 ├── tsdown.config.ts          # Self-contained transpile config
 ├── package.json
@@ -105,7 +105,7 @@ The skill will:
 
 ## Commit Convention
 
-See `assets/git-commit/references/git-commit-message.md` for the full AegisPipe rules.
+See `assets/7d-git-commit/references/git-commit-message.md` for the full AegisPipe rules.
 
 High-level requirements:
 
@@ -120,9 +120,9 @@ High-level requirements:
 
 The plugin provides both a client-side DSH skill and a server-side GitLab hook. Use them together for "client pre-check + server enforcement".
 
-- Client: `assets/git-commit/SKILL.md` validates commit messages before `git commit`.
+- Client: `assets/7d-git-commit/SKILL.md` validates commit messages before `git commit`.
 - Server: `docs/gitlab-integration/pre-receive` validates pushes before they reach GitLab.
-- Rule source: `assets/git-commit/references/git-commit-message.md` shared by both sides.
+- Rule source: `assets/7d-git-commit/references/git-commit-message.md` shared by both sides.
 
 ### Deploy server-side hooks
 
