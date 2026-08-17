@@ -1,0 +1,243 @@
+#!/usr/bin/env bash
+# ============================================================================
+# pre-receive —— GitLab 服务端提交信息校验 hook
+# ----------------------------------------------------------------------------
+# 适配 GitLab CE 19.2.0（Omnibus 直装，Gitaly 存储 /data/gitlab-data/git-data）
+#
+# 作用：推送到达仓库前，校验每个新提交的标题是否符合团队提交规范。
+#       不符合 → 按 MODE（warn/reject）告警或拒绝；命中 SKIP_KEYWORD → 放行。
+#
+# 规则外置：本脚本不含任何规则，全部从 commit-rules.conf 读取。
+#
+# 关键设计：
+#   1. while read 遍历 stdin 所有 ref
+#   2. 遍历 oldrev..newrev 全部新提交（不止查 HEAD）
+#   3. 新分支用 rev-list --not --all，只校验真正新增提交
+#   4. 跳过分支删除（newrev 全零）
+#   5. Merge commit 可配置豁免
+#   6. 用 GL-HOOK-ERR: 前缀输出错误，GitLab 19.x 会回显到 Web UI
+# ============================================================================
+
+set -u
+
+# ----------------------------------------------------------------------------
+# 0. 加载规则配置
+# ----------------------------------------------------------------------------
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+GLOBAL_HOOKS_DIR="/var/opt/gitlab/gitaly/custom_hooks"
+
+RULES_FILE=""
+for cand in \
+    "${SCRIPT_DIR}/commit-rules.conf" \
+    "${GLOBAL_HOOKS_DIR}/commit-rules.conf"; do
+    if [ -r "${cand}" ]; then
+        RULES_FILE="${cand}"
+        break
+    fi
+done
+
+MODE="warn"
+LOG_FILE="/var/log/gitlab/commit-check.log"
+COMMIT_REGEX='^【(新增|修复|优化|调整|删除|文档|测试|回滚|合并)】'
+TITLE_MAX_LEN=50
+REJECT_TRAILING_PUNCT=true
+DETAIL_MAX_LEN=70
+FORBIDDEN_CHARS='@#$%^&*~'
+FORBIDDEN_PHRASES='待优化|后续再改|待修改|以后再说|TODO|FIXME|哈哈哈|666'
+SKIP_KEYWORD="[skip-check]"
+ALLOW_MERGE=true
+DEBUG=false
+
+if [ -n "${RULES_FILE}" ]; then
+    # shellcheck disable=SC1090
+    source "${RULES_FILE}"
+else
+    echo "GL-HOOK-ERR: [提交校验] 未找到 commit-rules.conf，使用内置默认规则（warn 模式）。" >&2
+fi
+
+case "${MODE}" in
+    warn|reject) ;;
+    *)
+        echo "GL-HOOK-ERR: [提交校验] commit-rules.conf 的 MODE 值非法（=${MODE}），本次放行。" >&2
+        exit 0
+        ;;
+esac
+
+# ----------------------------------------------------------------------------
+# 1. 工具函数
+# ----------------------------------------------------------------------------
+ZERO="0000000000000000000000000000000000000000"
+
+log_line() {
+    local tag="$1" sha="$2" subject="$3" reason="$4"
+    local log_dir
+    log_dir="$(dirname "${LOG_FILE}")"
+    [ -d "${log_dir}" ] || return 0
+    [ -w "${LOG_FILE}" ] || [ ! -e "${LOG_FILE}" -a -w "${log_dir}" ] || return 0
+
+    local ts user repo
+    ts="$(date '+%Y-%m-%d %H:%M:%S%z')"
+    user="${GL_USERNAME:-unknown}"
+    repo="${GL_PROJECT_PATH:-unknown}"
+    { printf '%s | %-7s | user=%s | repo=%s | sha=%s | reason=%s | subject=%s\n' \
+        "${ts}" "${tag}" "${user}" "${repo}" "${sha}" "${reason}" "${subject}" \
+        >> "${LOG_FILE}"; } 2>/dev/null || true
+}
+
+emit() {
+    local kind="$1"; shift
+    if [ "${kind}" = "reject" ]; then
+        printf 'GL-HOOK-ERR: %s\n' "$*" >&2
+    else
+        printf '%s\n' "$*" >&2
+    fi
+}
+
+char_len() {
+    local s="$1" n lc
+    for lc in "C.UTF-8" "en_US.UTF-8" "zh_CN.UTF-8"; do
+        if [ "$(printf '中' | LC_ALL="${lc}" wc -m 2>/dev/null | awk '{print $1}')" = "1" ]; then
+            n=$(printf '%s' "${s}" | LC_ALL="${lc}" wc -m 2>/dev/null | awk '{print $1}')
+            printf '%s' "${n}"
+            return
+        fi
+    done
+    n=$(printf '%s' "${s}" | perl -CS -e 'print length(<STDIN>)' 2>/dev/null | awk '{print $1}')
+    if [ -n "${n}" ] && [ "${n}" != "0" ]; then
+        printf '%s' "${n}"
+        return
+    fi
+    printf '%s' "$(printf '%s' "${s}" | wc -c | awk '{print $1}')"
+}
+
+# ----------------------------------------------------------------------------
+# 2. 主循环
+# ----------------------------------------------------------------------------
+violation_count=0
+
+while read -r oldrev newrev refname; do
+    [ -z "${newrev:-}" ] && continue
+
+    if [ "${newrev}" = "${ZERO}" ]; then
+        continue
+    fi
+
+    if [ "${oldrev}" = "${ZERO}" ]; then
+        commits=$(git rev-list "${newrev}" --not --all 2>/dev/null)
+    else
+        commits=$(git rev-list "${oldrev}..${newrev}" 2>/dev/null)
+    fi
+
+    for c in ${commits}; do
+        subject=$(git log -1 --no-decorate --format='%s' "${c}" 2>/dev/null)
+        [ -z "${subject}" ] && continue
+        fullmsg=$(git log -1 --no-decorate --format='%B' "${c}" 2>/dev/null)
+        disp_subject=$(printf '%s' "${subject}" | head -1)
+
+        [ "${DEBUG}" = "true" ] && \
+            emit warn "[提交校验][DEBUG] ref=${refname} sha=${c} subject=${disp_subject}"
+
+        if printf '%s' "${subject}" | grep -qF "${SKIP_KEYWORD}"; then
+            log_line "BYPASS" "${c}" "${disp_subject}" "skip_keyword"
+            [ "${DEBUG}" = "true" ] && emit warn "[提交校验][DEBUG] 命中 ${SKIP_KEYWORD}，放行"
+            continue
+        fi
+
+        if [ "${ALLOW_MERGE}" = "true" ] && printf '%s' "${subject}" | grep -qE '^Merge '; then
+            log_line "BYPASS" "${c}" "${disp_subject}" "merge_commit"
+            continue
+        fi
+
+        reason=""
+
+        if ! printf '%s' "${subject}" | grep -qE "${COMMIT_REGEX}"; then
+            reason="标签不匹配规范"
+        fi
+
+        if [ -z "${reason}" ]; then
+            title_desc="${subject#*】}"
+            tlen=$(char_len "${title_desc}")
+            if [ -z "${title_desc}" ]; then
+                reason="标题缺少描述文字"
+            elif [ "${tlen}" -gt "${TITLE_MAX_LEN}" ]; then
+                reason="标题长度 ${tlen} 超过 ${TITLE_MAX_LEN} 字符"
+            fi
+        fi
+
+        if [ -z "${reason}" ] && [ "${REJECT_TRAILING_PUNCT}" = "true" ]; then
+            last_char=$(printf '%s' "${subject}" | grep -oE '.$')
+            case "${last_char}" in
+                '.'|','|'。'|'，')
+                    reason="标题以标点（${last_char}）结尾，规范禁止"
+                    ;;
+            esac
+        fi
+
+        if [ -z "${reason}" ] && [ -n "${FORBIDDEN_CHARS}" ]; then
+            bad_char=""
+            i=0
+            chars_len=${#FORBIDDEN_CHARS}
+            while [ "${i}" -lt "${chars_len}" ]; do
+                ch="${FORBIDDEN_CHARS:${i}:1}"
+                if [ -n "${ch}" ] && printf '%s' "${fullmsg}" | grep -qF "${ch}"; then
+                    bad_char="${ch}"
+                    break
+                fi
+                i=$((i + 1))
+            done
+            [ -n "${bad_char}" ] && reason="含禁止的特殊符号「${bad_char}」（规范禁止 @ # $ % ^ & * ~ 等）"
+        fi
+
+        if [ -z "${reason}" ] && [ -n "${FORBIDDEN_PHRASES}" ]; then
+            hit_phrase=$(printf '%s' "${fullmsg}" | grep -oE "${FORBIDDEN_PHRASES}" | head -1)
+            [ -n "${hit_phrase}" ] && reason="含禁止的短语「${hit_phrase}」（规范禁止临时标记/情绪化内容）"
+        fi
+
+        if [ -z "${reason}" ] && [ "${DETAIL_MAX_LEN:-0}" -gt 0 ] 2>/dev/null; then
+            long_line=""
+            while IFS= read -r line; do
+                [ -z "${line}" ] && continue
+                content_line="${line#"${line%%[!0-9]*}"}"
+                case "${content_line}" in
+                    .*|、*) content_line="${content_line#?}" ;;
+                esac
+                content_line="${content_line#"${content_line%%[![:space:]]*}"}"
+                [ -z "${content_line}" ] && continue
+                clen=$(char_len "${content_line}")
+                if [ "${clen}" -gt "${DETAIL_MAX_LEN}" ]; then
+                    long_line="${clen}"
+                    break
+                fi
+            done < <(printf '%s\n' "${fullmsg}" | tail -n +2)
+            [ -n "${long_line}" ] && reason="正文存在单行 ${long_line} 字符超过 ${DETAIL_MAX_LEN}（规范 detail≤70）"
+        fi
+
+        if [ -n "${reason}" ]; then
+            violation_count=$((violation_count + 1))
+            if [ "${MODE}" = "reject" ]; then
+                log_line "REJECT" "${c}" "${disp_subject}" "${reason}"
+                emit reject "[提交校验] 拒绝推送：commit ${c}（${disp_subject}）— ${reason}"
+                emit reject "              规范格式：【类型】简短描述，类型须为 新增/修复/优化/调整/删除/文档/测试/回滚/合并 之一"
+                emit reject "              如为紧急发版，可在提交信息加 ${SKIP_KEYWORD} 临时绕过（仍记录审计）"
+            else
+                log_line "WARN" "${c}" "${disp_subject}" "${reason}"
+                emit warn "[提交校验][观察期告警] commit ${c}（${disp_subject}）— ${reason}"
+            fi
+        else
+            log_line "CHECK" "${c}" "${disp_subject}" "pass"
+        fi
+    done
+done
+
+# ----------------------------------------------------------------------------
+# 3. 退出码
+# ----------------------------------------------------------------------------
+if [ "${MODE}" = "reject" ] && [ "${violation_count}" -gt 0 ]; then
+    emit reject "[提交校验] 共 ${violation_count} 处提交信息不合规，本次推送已被拒绝。修正后重新推送。"
+    exit 1
+fi
+
+if [ "${violation_count}" -gt 0 ]; then
+    emit warn "[提交校验][观察期] 检测到 ${violation_count} 处不合规提交，本次放行但已记录。"
+fi
+exit 0

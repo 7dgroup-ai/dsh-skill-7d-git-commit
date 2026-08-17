@@ -1,0 +1,63 @@
+/**
+ * Bundled `git-commit` skill provider.
+ *
+ * @module @7dgroup/dsh-skill-7d-git-commit
+ */
+
+import { readFile } from 'node:fs/promises'
+import { fileURLToPath } from 'node:url'
+import type { Context } from '@deepseek-ai/cordis'
+import {
+  BUNDLED_SKILL_RANK,
+  type SkillCandidate,
+  type SkillDefinition,
+  type SkillProvider,
+} from '@deepseek-ai/dsh-skill'
+
+const PROVIDER_NAME = 'git-commit'
+const SKILL_BODY_URL = new URL('../assets/git-commit/SKILL.md', import.meta.url)
+const RESOURCE_BASE = {
+  kind: 'directory',
+  path: fileURLToPath(new URL('../assets/git-commit/', import.meta.url)).replace(/[\\/]$/, ''),
+} as const
+const INVOCATION = { modelInvocable: true, userInvocable: true } as const
+const DESCRIPTION = 'AegisPipe 提交规范适配 Skill：在生成 git commit message 前自动校验并套用盛盾 AegisPipe 项目的提交规范，规避服务端 pre-receive hook 拦截。当用户需要 git commit 或生成提交信息时使用。'
+
+/* jscpd:ignore-start */
+const CANDIDATE: SkillCandidate = {
+  name: PROVIDER_NAME,
+  description: DESCRIPTION,
+  invocation: INVOCATION,
+  provider: PROVIDER_NAME,
+  source: 'bundled',
+  resourceBase: RESOURCE_BASE,
+  rank: BUNDLED_SKILL_RANK,
+  locator: SKILL_BODY_URL,
+}
+
+const provider: SkillProvider = {
+  name: PROVIDER_NAME,
+  list: () => Promise.resolve([CANDIDATE]),
+  async get(_candidate): Promise<SkillDefinition> {
+    return {
+      name: CANDIDATE.name,
+      description: CANDIDATE.description,
+      invocation: CANDIDATE.invocation,
+      provider: CANDIDATE.provider,
+      source: CANDIDATE.source,
+      resourceBase: RESOURCE_BASE,
+      content: await readFile(SKILL_BODY_URL, 'utf8'),
+    }
+  },
+}
+
+/** Cordis plugin name. */
+export const name = 'skill-git-commit'
+/** Service required by the bundled provider. */
+export const inject = ['skills']
+
+/** Register the bundled `git-commit` provider on `ctx.skills`. */
+export function apply(ctx: Context): void {
+  ctx.skills.registerProvider(() => provider)
+}
+/* jscpd:ignore-end */

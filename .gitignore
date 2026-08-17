@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Build output
+lib/
+
+# Package artifacts
+*.tgz
+
+# Logs
+*.log
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
