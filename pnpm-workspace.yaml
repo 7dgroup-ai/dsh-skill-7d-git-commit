@@ -1,0 +1,7 @@
+packages: []
+
+# pnpm 11 供应链策略默认要求包发布满 24 小时才可安装；
+# es-module-lexer@2.3.2 为 tsdown/rolldown 构建链路依赖，锁文件固定此版本，
+# 豁免其最小发布年龄检查，保证仓库在任何时刻均可 pnpm install。
+minimumReleaseAgeExclude:
+  - es-module-lexer@2.3.2
