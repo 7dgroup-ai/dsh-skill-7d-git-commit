@@ -112,6 +112,13 @@ Once installed, mention any commit-related request in a dsh session:
 
 > Generate a commit message for the current changes.
 
+Example triggers:
+
+- Generate a commit message for the current changes.
+- Write a commit message for these changes.
+- Check whether my commit message follows the 7DGroup convention.
+- Fix the commit message so it passes the validation rules.
+
 The skill will:
 
 1. Analyze the changes.

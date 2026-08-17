@@ -108,6 +108,13 @@ pnpm test    # vitest
 
 > 为当前改动生成一条 commit message。
 
+触发内容示例：
+
+- 为当前改动生成一条 commit message。
+- 帮我把这次的改动写一条提交信息。
+- 检查我的提交信息是否符合 7DGroup 提交规范。
+- 修正这条 commit message，让它通过规范校验。
+
 技能会执行：
 
 1. 分析改动内容。
