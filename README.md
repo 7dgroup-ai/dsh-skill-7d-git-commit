@@ -9,6 +9,10 @@
 </p>
 
 <p align="center">
+  <img alt="7d-git-commit cover" src="assets/images/7d-git-commit-cover.jpg" width="80%">
+</p>
+
+<p align="center">
   <strong>English</strong> | <a href="README.zh.md">中文</a>
 </p>
 
@@ -55,6 +59,8 @@ dsh-skill-7d-git-commit/
 │   ├── SKILL.md              # Skill body (validation logic)
 │   └── references/
 │       └── git-commit-message.md   # 7DGroup commit convention reference
+├── assets/images/
+│   └── 7d-git-commit-cover.jpg     # README cover image
 ├── tests/
 │   └── skill-7d-git-commit.spec.ts
 ├── cordis.patch.yml          # Composition layer patch
