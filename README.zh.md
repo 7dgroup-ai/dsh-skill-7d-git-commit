@@ -122,6 +122,53 @@ pnpm test    # vitest
 - 服务端：`docs/gitlab-integration/pre-receive` 在 `git push` 到达仓库前校验并告警/拦截。
 - 规范来源：`assets/7d-git-commit/references/git-commit-message.md`，客户端与服务端共用同一套规则。
 
+### 集成功能说明
+
+#### 背景：为什么要做提交信息校验
+
+每接收一份新版本代码，第一件事往往是查看 git log。如果提交记录杂乱无章、看不出每次提交做了什么，对他人 review 和后续维护都很痛苦。规范的提交记录（CHANGELOG）不仅有助于他人 review 代码，也能高效输出 Release Note，对版本管理至关重要。因此考虑用 GitLab 服务端 hook 对 git change log 做校验，拦截不符合规范的提交。
+
+#### 设计原理：选择 pre-receive 阶段拦截
+
+GitLab 服务端 hook 分为三种（对应 push 完成后服务端的处理流程）：
+
+| Hook | 阶段 | 作用 |
+|------|------|------|
+| `pre-receive` | 推送前 | 用户 push 之后刚到 GitLab 服务器内，用于拦截用户的推送 |
+| `update` | 更新中 | 提交更新到 GitLab 仓库内 |
+| `post-receive` | 推送后 | 提交到 GitLab 成功之后，用于推送通知 |
+
+处理流程示意：
+
+```mermaid
+flowchart LR
+    A[用户 push] --> B{pre-receive<br>推送前拦截}
+    B -- "非 0" --> C[结束推送<br>不合规提交被拒绝]
+    B -- 0 --> D[update<br>提交更新到仓库]
+    D --> E[post-receive<br>推送通知]
+```
+
+在 `pre-receive`（推送前）阶段做提交信息校验：如果不符合规范，脚本直接以非 0 退出，该推送便不会进入 GitLab 仓库。
+
+#### 工作原理
+
+`pre-receive` 从标准输入读取本次推送的信息：`oldrev newrev refname`（旧 commit id、新 commit id、分支名）；再用 `git log` 取出提交者、提交日期与提交注释；最后用正则校验标题是否以约定前缀开头（参考文章示例：`fix|add|del|update|temp|test|revert|Merge`），不匹配则输出错误并 `exit 1` 拒绝推送。
+
+#### 实践落地（参考文章的手动部署方式）
+
+1. **找到仓库物理路径**：GitLab 自某版本起采用 hash 存储，需通过管理员账号获取仓库对应的物理路径，形如 `/srv/gitlab/data/git-data/repositories/@hashed/78/5f/785f3ec7...git`。
+2. **创建 custom_hooks**：在仓库目录下新建 `custom_hooks` 目录，再创建 `pre-receive` 文件（shell 脚本）。
+3. **赋予执行权限**：`chmod +x pre-receive`。
+4. **本地 push 验证**：不符合规范的提交会推送失败，符合规范则正常推送。
+
+> 本仓库 `docs/gitlab-integration/` 是上述方案的工程化实现：遍历 stdin 全部 ref（而非只读第一行）、warn/reject 双模式、规则外置到 `commit-rules.conf`、审计日志与钉钉日报，可直接用 `install-hooks.sh` 一键部署，见下文。
+
+#### 踩坑
+
+GitLab 不同版本自带的 git 版本不一致，相同命令的输出也可能不一致，需要特别注意。例如 `git log --no-merges --date-order -1` 在不同 git 版本下输出格式存在差异，脚本不要依赖未验证的命令输出。
+
+> 参考文章：[GitLab 服务端 hook 拦截提交到仓库](https://zuozewei.blog.csdn.net/article/details/122124164)
+
 ### 部署服务端 hook
 
 将 `docs/gitlab-integration/` 目录复制到 GitLab 服务器，然后执行：

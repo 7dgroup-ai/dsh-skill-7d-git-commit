@@ -2,6 +2,8 @@
 
 > 本指南是 `@7dgroup/dsh-skill-7d-git-commit` 插件的配套文档，供运维团队将客户端提交规范校验延伸至 GitLab 服务端，形成"客户端预判 + 服务端兜底"的双层校验。
 >
+> 部署前请先阅读 [`scenarios.md`](./scenarios.md)（应用场景说明），确认本方案适用性与落地节奏（单仓试点 / 全局推广、观察期 / 硬拦截）。
+>
 > 事实来源：
 > - 客户端 skill：`assets/git-commit/SKILL.md`
 > - 提交规范：`assets/git-commit/references/git-commit-message.md`
@@ -18,6 +20,7 @@
 
 | 文件 | 用途 |
 |------|------|
+| `scenarios.md` | 应用场景说明：背景、典型场景、适用边界、踩坑 FAQ |
 | `pre-receive` | 服务端 hook 主脚本 |
 | `commit-rules.conf` | 校验规则配置 |
 | `install-hooks.sh` | 单仓试点 / 全局推广 / 卸载 |

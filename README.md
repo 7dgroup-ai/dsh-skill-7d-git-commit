@@ -124,6 +124,53 @@ The plugin provides both a client-side DSH skill and a server-side GitLab hook. 
 - Server: `docs/gitlab-integration/pre-receive` validates pushes before they reach GitLab.
 - Rule source: `assets/7d-git-commit/references/git-commit-message.md` shared by both sides.
 
+### Integration overview
+
+#### Why validate commit messages
+
+The first thing you do when receiving a new code drop is read the git log. A messy log that does not tell you what each commit actually did makes reviews and maintenance painful. Well-formed commit messages (a changelog) help others review the code, produce Release Notes efficiently, and matter greatly for version management. That is why we use GitLab server-side hooks to validate the git change log and block non-conforming commits.
+
+#### Design: enforce at the `pre-receive` stage
+
+GitLab runs three server-side hooks after a push (the flow the server performs):
+
+| Hook | Stage | Role |
+|------|-------|------|
+| `pre-receive` | before push is applied | runs as soon as the push reaches the GitLab server — the interception point |
+| `update` | during push | commits the update into the GitLab repository |
+| `post-receive` | after push | runs after the push succeeds — used for notifications |
+
+Flow:
+
+```mermaid
+flowchart LR
+    A[user push] --> B{pre-receive<br>intercept before apply}
+    B -- "non-zero" --> C[push rejected<br>non-conforming commit]
+    B -- 0 --> D[update<br>apply to repository]
+    D --> E[post-receive<br>notify]
+```
+
+Validating at the `pre-receive` stage: if a commit message does not conform, the hook exits with a non-zero code and the push never lands in the GitLab repository.
+
+#### How it works
+
+`pre-receive` reads the pushed refs from stdin as `oldrev newrev refname` (old commit id, new commit id, branch name), then uses `git log` to extract the author, date, and subject. A regex checks that the subject starts with an allowed prefix (the referenced article's example: `fix|add|del|update|temp|test|revert|Merge`); on mismatch it prints an error and `exit 1` rejects the push.
+
+#### Manual deployment (per the referenced article)
+
+1. **Locate the repository path**: GitLab switched to hashed storage, so get the on-disk path via an admin account, e.g. `/srv/gitlab/data/git-data/repositories/@hashed/78/5f/785f3ec7...git`.
+2. **Create `custom_hooks`**: inside the repository directory, create a `custom_hooks` folder with a `pre-receive` file (a shell script).
+3. **Make it executable**: `chmod +x pre-receive`.
+4. **Verify with a local push**: non-conforming commits fail to push; conforming ones go through.
+
+> The `docs/gitlab-integration/` directory in this repo is the productionized version of that approach: it iterates over every ref on stdin (not just the first line), supports warn/reject modes, externalizes rules into `commit-rules.conf`, and adds audit logging plus DingTalk reports — deployable with `install-hooks.sh` as shown below.
+
+#### Pitfalls
+
+GitLab versions bundle different git versions, and the same command can produce different output across them. For example, `git log --no-merges --date-order -1` output differs between git versions — do not rely on unverified command output in hooks.
+
+> Reference article: [GitLab 服务端 hook 拦截提交到仓库](https://zuozewei.blog.csdn.net/article/details/122124164)
+
 ### Deploy server-side hooks
 
 Copy `docs/gitlab-integration/` to the GitLab server, then run:

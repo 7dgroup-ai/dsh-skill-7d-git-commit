@@ -15,6 +15,7 @@
 ```
 docs/gitlab-integration/
 ├── README.md                          # 本文件
+├── scenarios.md                       # 应用场景说明（背景、典型场景、适用边界、踩坑 FAQ）
 ├── deployment-guide.md                # 部署 SOP：单仓试点 → 全局推广 → 硬拦截 → 回滚
 ├── switch-to-reject-checklist.md      # 观察期转硬拦截检查清单
 ├── commit-rules.conf                  # 校验规则配置
@@ -29,6 +30,7 @@ docs/gitlab-integration/
 
 ## 快速开始
 
+0. **确认场景**：先阅读 [`scenarios.md`](./scenarios.md)，判断本方案是否适用、选择单仓试点还是全局推广、观察期还是硬拦截。
 1. **确认规则**：编辑 `commit-rules.conf`，与开发团队确认 9 类标签、长度、禁用字符/短语等。
 2. **本地自测**：
    ```bash
@@ -47,6 +49,7 @@ docs/gitlab-integration/
 
 ## 运维配套
 
+- 应用场景判断：[`scenarios.md`](./scenarios.md)
 - 观察期巡检：`scripts/audit-report.sh`
 - 钉钉日报：`scripts/dingtalk-notify.sh`
 - 规则同步：`scripts/sync-rules.sh`
