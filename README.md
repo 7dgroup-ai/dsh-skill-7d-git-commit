@@ -136,6 +136,8 @@ High-level requirements:
 
 The plugin provides both a client-side DSH skill and a server-side GitLab hook. Use them together for "client pre-check + server enforcement".
 
+**Compatibility:** The server-side integration is adapted for and verified on **GitLab CE 19.2.0** (custom hooks + rule configuration).
+
 - Client: `assets/7d-git-commit/SKILL.md` validates commit messages before `git commit`.
 - Server: `docs/gitlab-integration/pre-receive` validates pushes before they reach GitLab.
 - Rule source: `assets/7d-git-commit/references/git-commit-message.md` shared by both sides.

@@ -132,6 +132,8 @@ pnpm test    # vitest
 
 本插件同时提供客户端 DSH skill 与服务端 GitLab hook，建议组合使用形成"客户端预判 + 服务端兜底"的双层校验。
 
+**兼容性说明：**服务端集成方案已适配并在 **GitLab CE 19.2.0** 上验证通过（custom hooks + 规则配置）。
+
 - 客户端：`assets/7d-git-commit/SKILL.md` 在 `git commit` 前校验提交信息。
 - 服务端：`docs/gitlab-integration/pre-receive` 在 `git push` 到达仓库前校验并告警/拦截。
 - 规范来源：`assets/7d-git-commit/references/git-commit-message.md`，客户端与服务端共用同一套规则。
