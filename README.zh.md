@@ -1,4 +1,8 @@
 <p align="center">
+  <img alt="7d-git-commit 封面图" src="assets/images/7d-git-commit-cover.jpg" width="80%">
+</p>
+
+<p align="center">
   <strong style="font-size: 1.5rem;">@7dgroup/dsh-skill-7d-git-commit</strong>
 </p>
 
@@ -6,10 +10,6 @@
   <img alt="license MIT" src="https://img.shields.io/badge/license-MIT-263146?style=flat-square">
   <img alt="node" src="https://img.shields.io/badge/node-%5E22.19%20%7C%7C%20%3E%3D24-339933?style=flat-square">
   <img alt="by 7DGroup" src="https://img.shields.io/badge/by-7DGroup-7da1de?style=flat-square">
-</p>
-
-<p align="center">
-  <img alt="7d-git-commit 封面图" src="assets/images/7d-git-commit-cover.jpg" width="80%">
 </p>
 
 <p align="center">
